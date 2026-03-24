@@ -1,8 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Calendar, Loader2, MapPin, Menu, X } from "lucide-react";
-import { useCallback, useState } from "react";
+import { Calendar, Check, Download, MapPin, Menu, X } from "lucide-react";
+import { useCallback, useRef, useState } from "react";
 import { SiInstagram } from "react-icons/si";
-import { useSubmitRSVP } from "./hooks/useQueries";
 
 const queryClient = new QueryClient();
 
@@ -386,11 +385,11 @@ function HeroSection() {
       />
 
       {/* RSVP button — evenly spaced below banner */}
-      <div className="flex items-center justify-center py-10">
+      <div className="flex items-center justify-center py-8 sm:py-10 px-4">
         <button
           type="button"
           onClick={handleRSVP}
-          className="px-10 py-4 rounded-full font-display font-bold text-base tracking-widest uppercase transition-all hover:scale-105 shadow-lg"
+          className="px-8 sm:px-10 py-3 sm:py-4 rounded-full font-display font-bold text-sm sm:text-base tracking-widest uppercase transition-all hover:scale-105 shadow-lg"
           style={{
             backgroundColor: "oklch(0 0 0)",
             color: "#ffffff",
@@ -411,7 +410,7 @@ function WhatIsSOFSection() {
   return (
     <section
       id="about"
-      className="relative py-24 overflow-hidden"
+      className="relative py-16 sm:py-24 overflow-hidden"
       style={{ backgroundColor: "oklch(0.96 0 0)" }}
     >
       {/* Side curtain decors */}
@@ -450,8 +449,9 @@ function WhatIsSOFSection() {
         />
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-8 sm:px-12">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
+      {/* Reduced horizontal padding on mobile: px-4 instead of px-8 */}
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-12">
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
           {/* Left: heading + divider */}
           <div className="flex flex-col items-start">
             <div className="flex justify-start mb-4">
@@ -499,6 +499,56 @@ function WhatIsSOFSection() {
 
 // ─── Theme Curtain Reveal ─────────────────────────────────────────────────────
 
+const VELVET_LEFT = `linear-gradient(
+  to right,
+  #3d0000 0%,
+  #6b0000 4%,
+  #8b0000 8%,
+  #c0392b 14%,
+  #e04040 19%,
+  #c0392b 24%,
+  #8b1a1a 30%,
+  #6b0000 36%,
+  #4a0000 40%,
+  #6b0000 44%,
+  #8b0000 48%,
+  #c0392b 54%,
+  #e04040 59%,
+  #c0392b 64%,
+  #8b1a1a 70%,
+  #6b0000 76%,
+  #4a0000 80%,
+  #6b0000 84%,
+  #9b2020 90%,
+  #c0392b 94%,
+  #8b0000 100%
+)`;
+
+const VELVET_RIGHT = `linear-gradient(
+  to left,
+  #3d0000 0%,
+  #6b0000 4%,
+  #8b0000 8%,
+  #c0392b 14%,
+  #e04040 19%,
+  #c0392b 24%,
+  #8b1a1a 30%,
+  #6b0000 36%,
+  #4a0000 40%,
+  #6b0000 44%,
+  #8b0000 48%,
+  #c0392b 54%,
+  #e04040 59%,
+  #c0392b 64%,
+  #8b1a1a 70%,
+  #6b0000 76%,
+  #4a0000 80%,
+  #6b0000 84%,
+  #9b2020 90%,
+  #c0392b 94%,
+  #8b0000 100%
+)`;
+
 function ThemeRevealSection() {
   const [phase, setPhase] = useState<"idle" | "drawing" | "open">("idle");
 
@@ -511,7 +561,7 @@ function ThemeRevealSection() {
   return (
     <section
       id="theme"
-      className="relative py-20 overflow-hidden"
+      className="relative py-16 sm:py-20 overflow-hidden"
       style={{ backgroundColor: "#ffffff" }}
     >
       <MandalaSVG className="absolute top-4 right-4 w-32 h-32 opacity-10 pointer-events-none" />
@@ -526,33 +576,36 @@ function ThemeRevealSection() {
         </h2>
         <BlackDivider />
         <p
-          className="font-body text-sm mb-10 mt-2"
+          className="font-body text-sm mb-8 sm:mb-10 mt-2"
           style={{ color: "oklch(0 0 0 / 0.5)" }}
         >
           Something special awaits...
         </p>
 
-        {/* Curtain stage */}
+        {/* Curtain stage — responsive height */}
         <button
           type="button"
-          className="relative mx-auto overflow-hidden rounded-lg block w-full"
+          className="relative mx-auto overflow-hidden block w-full"
           onClick={handleClick}
           aria-label="Draw mudra to open curtains"
           data-ocid="theme.open_modal_button"
           style={{
             maxWidth: 720,
-            minHeight: 380,
-            backgroundColor: "#1a0000",
-            border: "2px solid oklch(0 0 0)",
-            boxShadow: "0 20px 80px oklch(0 0 0 / 0.20)",
+            /* On mobile ~56vw tall, on desktop fixed 420px min */
+            minHeight: "clamp(240px, 56vw, 420px)",
+            backgroundColor: "#0d0000",
+            border: "3px solid #3d1a00",
+            borderRadius: "4px",
+            boxShadow:
+              "0 24px 80px rgba(0,0,0,0.45), inset 0 0 60px rgba(0,0,0,0.3)",
             cursor: phase === "idle" ? "pointer" : "default",
             padding: 0,
           }}
         >
-          {/* Revealed content — image filling the stage */}
+          {/* Revealed content — image filling the stage completely */}
           <div className="absolute inset-0">
             <img
-              src="/assets/uploads/2-019d1c03-2494-702b-9d4a-8a06f32802ea-1.jpg"
+              src="/assets/uploads/1-019d1c4e-7a2e-749e-abeb-6adb7645be03-1.jpg"
               alt="State of Fashion 2026 Theme"
               style={{
                 width: "100%",
@@ -562,6 +615,19 @@ function ThemeRevealSection() {
               }}
             />
           </div>
+
+          {/* Valance / pelmet bar at top */}
+          <div
+            className="absolute top-0 left-0 right-0"
+            style={{
+              height: 28,
+              background:
+                "linear-gradient(to bottom, #1a0800, #3d1a00 60%, #6b3000)",
+              zIndex: 30,
+              boxShadow: "0 4px 12px rgba(0,0,0,0.6)",
+            }}
+            aria-hidden="true"
+          />
 
           {/* Left curtain panel */}
           <div
@@ -575,9 +641,11 @@ function ThemeRevealSection() {
                   ? "transform 0.9s cubic-bezier(0.4, 0, 0.2, 1)"
                   : "none",
               zIndex: 10,
-              backgroundColor: "#c0392b",
+              background: VELVET_LEFT,
               boxShadow:
-                phase === "open" ? "none" : "4px 0 24px rgba(0,0,0,0.5)",
+                phase === "open"
+                  ? "none"
+                  : "6px 0 32px rgba(0,0,0,0.6), inset -4px 0 16px rgba(0,0,0,0.4)",
             }}
             aria-hidden="true"
           />
@@ -594,14 +662,16 @@ function ThemeRevealSection() {
                   ? "transform 0.9s cubic-bezier(0.4, 0, 0.2, 1)"
                   : "none",
               zIndex: 10,
-              backgroundColor: "#c0392b",
+              background: VELVET_RIGHT,
               boxShadow:
-                phase === "open" ? "none" : "-4px 0 24px rgba(0,0,0,0.5)",
+                phase === "open"
+                  ? "none"
+                  : "-6px 0 32px rgba(0,0,0,0.6), inset 4px 0 16px rgba(0,0,0,0.4)",
             }}
             aria-hidden="true"
           />
 
-          {/* Mudra drawing overlay — centered on curtain seam */}
+          {/* Mudra drawing overlay — centered on curtain seam, responsive size */}
           <div
             className="absolute"
             style={{
@@ -612,6 +682,7 @@ function ThemeRevealSection() {
               pointerEvents: "none",
               opacity: phase === "open" ? 0 : phase === "drawing" ? 1 : 0,
               transition: phase === "open" ? "opacity 0.5s ease" : "none",
+              /* Mudra visible on idle too so user knows to click */
             }}
             aria-hidden="true"
           >
@@ -619,7 +690,8 @@ function ThemeRevealSection() {
               src="/assets/uploads/mudra-019d1c49-97a0-771e-abbe-ac051bb3b1d0-1.png"
               alt=""
               style={{
-                width: 280,
+                /* Responsive: 60vw on mobile, capped at 280px on desktop */
+                width: "min(60vw, 280px)",
                 height: "auto",
                 display: "block",
                 clipPath:
@@ -653,7 +725,7 @@ function EventDetailsSection() {
   return (
     <section
       id="details"
-      className="relative py-24 overflow-hidden"
+      className="relative py-16 sm:py-24 overflow-hidden"
       style={{ backgroundColor: "oklch(0.96 0 0)" }}
     >
       <PaisleySVG className="absolute top-6 right-8 w-28 h-28 opacity-15 pointer-events-none" />
@@ -668,11 +740,11 @@ function EventDetailsSection() {
         </h2>
         <BlackDivider />
 
-        <div className="mt-12 grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
-          {/* Date card */}
-          <OrnateCornerBorder className="p-8">
+        <div className="mt-10 sm:mt-12 grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+          {/* Date card — reduced padding on mobile */}
+          <OrnateCornerBorder className="p-4 sm:p-8">
             <div
-              className="rounded-xl p-6 text-center"
+              className="rounded-xl p-5 sm:p-6 text-center"
               style={{
                 backgroundColor: "#ffffff",
                 border: "1px solid oklch(0 0 0 / 0.12)",
@@ -704,10 +776,10 @@ function EventDetailsSection() {
             </div>
           </OrnateCornerBorder>
 
-          {/* Venue card */}
-          <OrnateCornerBorder className="p-8">
+          {/* Venue card — reduced padding on mobile */}
+          <OrnateCornerBorder className="p-4 sm:p-8">
             <div
-              className="rounded-xl p-6 text-center"
+              className="rounded-xl p-5 sm:p-6 text-center"
               style={{
                 backgroundColor: "#ffffff",
                 border: "1px solid oklch(0 0 0 / 0.12)",
@@ -750,7 +822,7 @@ function ScheduleSection() {
   return (
     <section
       id="schedule"
-      className="relative py-24 overflow-hidden"
+      className="relative py-16 sm:py-24 overflow-hidden"
       style={{ backgroundColor: "#ffffff" }}
     >
       <MandalaSVG className="absolute top-8 right-8 w-32 h-32 opacity-10 pointer-events-none" />
@@ -765,21 +837,21 @@ function ScheduleSection() {
           </h2>
           <BlackDivider />
           <p
-            className="font-body text-sm mt-2 mb-12"
+            className="font-body text-sm mt-2 mb-10 sm:mb-12"
             style={{ color: "oklch(0 0 0 / 0.5)" }}
           >
             25th April, 2026 · FAD International, Bandra
           </p>
         </div>
 
-        {/* Two stamp boxes side by side */}
-        <div className="grid sm:grid-cols-2 gap-10">
+        {/* Two stamp boxes — stacks on mobile, side-by-side on sm+ */}
+        <div className="grid sm:grid-cols-2 gap-8 sm:gap-10">
           {/* Box 1 */}
           <div
-            className="flex flex-col items-center gap-5"
+            className="flex flex-col items-center gap-4 sm:gap-5"
             data-ocid="schedule.item.1"
           >
-            <div className="w-full">
+            <div className="w-full max-w-xs sm:max-w-none mx-auto">
               <img
                 src="/assets/uploads/screenshot_2026-03-24_at_01.16.14-019d1c46-169a-72e5-8c77-8761019f9065-1.png"
                 alt="The Hottest Fashion Event"
@@ -801,10 +873,10 @@ function ScheduleSection() {
 
           {/* Box 2 */}
           <div
-            className="flex flex-col items-center gap-5"
+            className="flex flex-col items-center gap-4 sm:gap-5"
             data-ocid="schedule.item.2"
           >
-            <div className="w-full">
+            <div className="w-full max-w-xs sm:max-w-none mx-auto">
               <img
                 src="/assets/uploads/screenshot_2026-03-24_at_01.16.24-019d1c46-16d3-76dc-92ee-654977523600-2.png"
                 alt="Mirchi Madness AfterParty"
@@ -831,29 +903,103 @@ function ScheduleSection() {
 
 // ─── RSVP Section ─────────────────────────────────────────────────────────────
 
-function RSVPSection() {
-  const [form, setForm] = useState({ name: "", email: "", phone: "" });
-  const [submitted, setSubmitted] = useState(false);
-  const submitMutation = useSubmitRSVP();
+const STORAGE_KEY = "sof2026_rsvp_entries";
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      await submitMutation.mutateAsync({
-        name: form.name,
-        email: form.email,
-        phone: form.phone || undefined,
-      });
-      setSubmitted(true);
-    } catch {
-      // error shown below
+type RSVPEntry = {
+  name: string;
+  email: string;
+  phone: string;
+  timestamp: string;
+};
+
+function RSVPSection() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const tripleClickCount = useRef(0);
+  const tripleClickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleLimitedSeatsClick = () => {
+    tripleClickCount.current += 1;
+    if (tripleClickCount.current >= 3) {
+      tripleClickCount.current = 0;
+      setShowAdmin((v) => !v);
+      if (tripleClickTimer.current) clearTimeout(tripleClickTimer.current);
+      return;
     }
+    if (tripleClickTimer.current) clearTimeout(tripleClickTimer.current);
+    tripleClickTimer.current = setTimeout(() => {
+      tripleClickCount.current = 0;
+    }, 600);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const entry: RSVPEntry = {
+      name: name.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      timestamp: new Date().toISOString(),
+    };
+    const existing: RSVPEntry[] = JSON.parse(
+      localStorage.getItem(STORAGE_KEY) ?? "[]",
+    );
+    existing.push(entry);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+    setSubmitted(true);
+  };
+
+  const handleExportCSV = () => {
+    const entries: RSVPEntry[] = JSON.parse(
+      localStorage.getItem(STORAGE_KEY) ?? "[]",
+    );
+    const header = "Name,Email,Phone,Timestamp";
+    const rows = entries.map(
+      (r) =>
+        `"${r.name.replace(/"/g, '""')}","${r.email.replace(/"/g, '""')}","${r.phone.replace(/"/g, '""')}","${r.timestamp}"`,
+    );
+    const csv = [header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sof2026_rsvp.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const entryCount = JSON.parse(
+    localStorage.getItem(STORAGE_KEY) ?? "[]",
+  ).length;
+
+  const inputStyle = {
+    width: "100%",
+    backgroundColor: "#ffffff",
+    border: "1.5px solid oklch(0 0 0)",
+    borderRadius: "6px",
+    padding: "12px 14px",
+    fontSize: "15px",
+    fontFamily: "inherit",
+    outline: "none",
+    color: "oklch(0 0 0)",
+  };
+
+  const labelStyle: React.CSSProperties = {
+    display: "block",
+    fontSize: "11px",
+    letterSpacing: "0.15em",
+    textTransform: "uppercase" as const,
+    color: "oklch(0 0 0 / 0.6)",
+    marginBottom: "6px",
+    fontFamily: "inherit",
   };
 
   return (
     <section
       id="rsvp"
-      className="relative py-24 overflow-hidden"
+      className="relative py-16 sm:py-24 overflow-hidden"
       style={{ backgroundColor: "oklch(0.96 0 0)" }}
     >
       {/* Dot grid overlay */}
@@ -877,12 +1023,47 @@ function RSVPSection() {
         >
           Secure Your Spot
         </h2>
-        <p
-          className="font-display text-sm mb-3"
+
+        {/* Triple-click to reveal admin panel */}
+        <button
+          type="button"
+          onClick={handleLimitedSeatsClick}
+          className="font-display text-sm mb-3 bg-transparent border-none cursor-pointer p-0"
           style={{ color: "oklch(0.5 0 0)" }}
+          data-ocid="rsvp.toggle"
         >
           Limited seats
-        </p>
+        </button>
+
+        {/* Hidden admin panel */}
+        {showAdmin && (
+          <div
+            className="mb-4 rounded-lg p-4 text-left"
+            style={{
+              border: "1.5px solid oklch(0 0 0)",
+              backgroundColor: "#fff",
+            }}
+            data-ocid="rsvp.panel"
+          >
+            <p
+              className="font-display text-sm mb-3"
+              style={{ color: "oklch(0 0 0)" }}
+            >
+              {entryCount} response{entryCount !== 1 ? "s" : ""} registered
+            </p>
+            <button
+              type="button"
+              onClick={handleExportCSV}
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-display tracking-widest uppercase transition-opacity hover:opacity-80"
+              style={{ backgroundColor: "oklch(0 0 0)", color: "#fff" }}
+              data-ocid="rsvp.secondary_button"
+            >
+              <Download size={14} />
+              Export CSV
+            </button>
+          </div>
+        )}
+
         <p
           className="font-body text-base mb-6"
           style={{ color: "oklch(0.25 0 0)" }}
@@ -891,150 +1072,109 @@ function RSVPSection() {
         </p>
         <BlackDivider />
 
-        {submitted ? (
-          <div
-            className="mt-8 p-8 rounded-2xl text-center"
-            style={{
-              backgroundColor: "#ffffff",
-              border: "2px solid oklch(0 0 0)",
-            }}
-            data-ocid="rsvp.success_state"
-          >
-            <div className="text-5xl mb-4">🎉</div>
-            <h3
-              className="font-display text-2xl font-bold mb-3"
-              style={{ color: "oklch(0 0 0)" }}
+        <div className="mt-8" data-ocid="rsvp.panel">
+          {submitted ? (
+            /* ── Success state ── */
+            <div
+              className="rounded-2xl p-8 sm:p-10 text-center"
+              style={{
+                backgroundColor: "#ffffff",
+                border: "1.5px solid oklch(0 0 0)",
+              }}
+              data-ocid="rsvp.success_state"
             >
-              You're on the list!
-            </h3>
-            <p
-              className="font-body text-sm leading-relaxed"
-              style={{ color: "oklch(0.25 0 0)" }}
-            >
-              See you at State of Fashion 2026. Get ready to spice things up. 🌶️
-            </p>
-          </div>
-        ) : (
-          <form
-            onSubmit={handleSubmit}
-            className="mt-8 space-y-4 text-left"
-            data-ocid="rsvp.panel"
-          >
-            <div>
-              <label
-                htmlFor="rsvp-name"
-                className="block font-body text-xs font-semibold uppercase tracking-[0.12em] mb-1.5"
+              <div
+                className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5"
+                style={{ backgroundColor: "oklch(0 0 0)" }}
+              >
+                <Check size={28} color="#ffffff" strokeWidth={2.5} />
+              </div>
+              <h3
+                className="font-display text-xl sm:text-2xl font-bold mb-2"
                 style={{ color: "oklch(0 0 0)" }}
               >
-                Full Name *
-              </label>
-              <input
-                id="rsvp-name"
-                type="text"
-                required
-                autoComplete="name"
-                value={form.name}
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, name: e.target.value }))
-                }
-                placeholder="Your full name"
-                className="w-full px-4 py-3 rounded-xl font-body text-sm outline-none transition-shadow"
-                style={{
-                  backgroundColor: "#ffffff",
-                  border: "1.5px solid oklch(0 0 0 / 0.4)",
-                  color: "oklch(0 0 0)",
-                }}
-                data-ocid="rsvp.input"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="rsvp-email"
-                className="block font-body text-xs font-semibold uppercase tracking-[0.12em] mb-1.5"
-                style={{ color: "oklch(0 0 0)" }}
-              >
-                Email Address *
-              </label>
-              <input
-                id="rsvp-email"
-                type="email"
-                required
-                autoComplete="email"
-                value={form.email}
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, email: e.target.value }))
-                }
-                placeholder="your@email.com"
-                className="w-full px-4 py-3 rounded-xl font-body text-sm outline-none transition-shadow"
-                style={{
-                  backgroundColor: "#ffffff",
-                  border: "1.5px solid oklch(0 0 0 / 0.4)",
-                  color: "oklch(0 0 0)",
-                }}
-                data-ocid="rsvp.input"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="rsvp-phone"
-                className="block font-body text-xs font-semibold uppercase tracking-[0.12em] mb-1.5"
-                style={{ color: "oklch(0 0 0)" }}
-              >
-                Phone Number{" "}
-                <span style={{ color: "oklch(0 0 0 / 0.45)" }}>(optional)</span>
-              </label>
-              <input
-                id="rsvp-phone"
-                type="tel"
-                autoComplete="tel"
-                value={form.phone}
-                onChange={(e) =>
-                  setForm((p) => ({ ...p, phone: e.target.value }))
-                }
-                placeholder="+91 98765 43210"
-                className="w-full px-4 py-3 rounded-xl font-body text-sm outline-none transition-shadow"
-                style={{
-                  backgroundColor: "#ffffff",
-                  border: "1.5px solid oklch(0 0 0 / 0.4)",
-                  color: "oklch(0 0 0)",
-                }}
-                data-ocid="rsvp.input"
-              />
-            </div>
-
-            {submitMutation.isError && (
+                Interest Registered!
+              </h3>
               <p
-                className="text-xs font-body px-3 py-2 rounded-lg"
-                style={{
-                  backgroundColor: "oklch(0.577 0.245 27.325 / 0.08)",
-                  color: "oklch(0.40 0.20 25)",
-                  border: "1px solid oklch(0.577 0.245 27.325 / 0.3)",
-                }}
-                data-ocid="rsvp.error_state"
+                className="font-body text-base"
+                style={{ color: "oklch(0.25 0 0)" }}
               >
-                Something went wrong. Please try again.
+                Thanks {name.split(" ")[0]}, we'll be in touch. See you on April
+                25th!
               </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={submitMutation.isPending}
-              className="w-full py-4 rounded-full font-body font-bold text-base mt-2 transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              style={{ backgroundColor: "oklch(0 0 0)", color: "#ffffff" }}
-              data-ocid="rsvp.submit_button"
+            </div>
+          ) : (
+            /* ── Form ── */
+            <form
+              onSubmit={handleSubmit}
+              className="rounded-2xl p-6 sm:p-8 text-left"
+              style={{
+                backgroundColor: "#ffffff",
+                border: "1.5px solid oklch(0 0 0)",
+              }}
             >
-              {submitMutation.isPending ? (
-                <>
-                  <Loader2 className="animate-spin" size={18} /> Submitting...
-                </>
-              ) : (
-                "RSVP Now 🌶️"
-              )}
-            </button>
-          </form>
-        )}
+              {/* Name */}
+              <div className="mb-5">
+                <label htmlFor="rsvp-name" style={labelStyle}>
+                  Name
+                </label>
+                <input
+                  id="rsvp-name"
+                  type="text"
+                  required
+                  placeholder="Your full name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  style={inputStyle}
+                  data-ocid="rsvp.input"
+                />
+              </div>
+
+              {/* Email */}
+              <div className="mb-5">
+                <label htmlFor="rsvp-email" style={labelStyle}>
+                  Email
+                </label>
+                <input
+                  id="rsvp-email"
+                  type="email"
+                  required
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  style={inputStyle}
+                  data-ocid="rsvp.input"
+                />
+              </div>
+
+              {/* Phone */}
+              <div className="mb-7">
+                <label htmlFor="rsvp-phone" style={labelStyle}>
+                  Phone Number
+                </label>
+                <input
+                  id="rsvp-phone"
+                  type="tel"
+                  required
+                  placeholder="+91 XXXXX XXXXX"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  style={inputStyle}
+                  data-ocid="rsvp.input"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 rounded-full font-display font-bold text-sm tracking-widest uppercase transition-opacity hover:opacity-80"
+                style={{ backgroundColor: "oklch(0 0 0)", color: "#ffffff" }}
+                data-ocid="rsvp.submit_button"
+              >
+                Register Your Interest
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </section>
   );
@@ -1124,9 +1264,9 @@ function Footer() {
 
 function AppContent() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden w-full">
       <Navbar />
-      <main>
+      <main className="w-full overflow-x-hidden">
         <HeroSection />
         <WhatIsSOFSection />
         <ThemeRevealSection />
