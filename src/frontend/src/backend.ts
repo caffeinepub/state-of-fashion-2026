@@ -95,6 +95,12 @@ export interface InviteCode {
     used: boolean;
 }
 export type Time = bigint;
+export interface OpenRSVPEntry {
+    name: string;
+    email: string;
+    phone: string;
+    timestamp: bigint;
+}
 export interface UserProfile {
     name: string;
     email: string;
@@ -115,6 +121,7 @@ export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     generateInviteCode(): Promise<string>;
+    getAllOpenRSVPs(): Promise<Array<OpenRSVPEntry>>;
     getAllRSVPs(): Promise<Array<RSVP>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
@@ -122,6 +129,7 @@ export interface backendInterface {
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    submitOpenRSVP(name: string, email: string, phone: string): Promise<void>;
     submitRSVP(name: string, attending: boolean, inviteCode: string): Promise<void>;
 }
 import type { UserProfile as _UserProfile, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
@@ -166,6 +174,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.generateInviteCode();
+            return result;
+        }
+    }
+    async getAllOpenRSVPs(): Promise<Array<OpenRSVPEntry>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getAllOpenRSVPs();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getAllOpenRSVPs();
             return result;
         }
     }
@@ -264,6 +286,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.saveCallerUserProfile(to_candid_UserProfile_n9(this._uploadFile, this._downloadFile, arg0));
+            return result;
+        }
+    }
+    async submitOpenRSVP(arg0: string, arg1: string, arg2: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.submitOpenRSVP(arg0, arg1, arg2);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.submitOpenRSVP(arg0, arg1, arg2);
             return result;
         }
     }

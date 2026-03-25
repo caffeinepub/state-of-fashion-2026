@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { SiInstagram } from "react-icons/si";
+import { useActor } from "./hooks/useActor";
 import { useGetAllOpenRSVPs, useSubmitOpenRSVP } from "./hooks/useQueries";
 
 const queryClient = new QueryClient();
@@ -973,6 +974,7 @@ function RSVPSection() {
   const tripleClickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const submitOpenRSVPMutation = useSubmitOpenRSVP();
+  const { actor, isFetching: isActorLoading } = useActor();
   const { data: rsvpEntries = [], refetch: refetchRSVPs } =
     useGetAllOpenRSVPs();
 
@@ -1000,8 +1002,12 @@ function RSVPSection() {
         phone: phone.trim(),
       });
       setSubmitted(true);
-    } catch {
-      setSubmitError("Something went wrong. Please try again.");
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.";
+      setSubmitError(message);
     }
   };
 
@@ -1217,14 +1223,18 @@ function RSVPSection() {
 
               <button
                 type="submit"
-                disabled={submitOpenRSVPMutation.isPending}
+                disabled={
+                  isActorLoading || submitOpenRSVPMutation.isPending || !actor
+                }
                 className="w-full py-3 rounded-full font-display font-bold text-sm tracking-widest uppercase transition-opacity hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: "oklch(0 0 0)", color: "#ffffff" }}
                 data-ocid="rsvp.submit_button"
               >
-                {submitOpenRSVPMutation.isPending
-                  ? "Registering..."
-                  : "Register Your Interest"}
+                {isActorLoading
+                  ? "Connecting..."
+                  : submitOpenRSVPMutation.isPending
+                    ? "Registering..."
+                    : "Register Your Interest"}
               </button>
               {submitError && (
                 <p

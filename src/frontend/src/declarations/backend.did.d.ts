@@ -15,6 +15,12 @@ export interface InviteCode {
   'code' : string,
   'used' : boolean,
 }
+export interface OpenRSVPEntry {
+  'name' : string,
+  'email' : string,
+  'phone' : string,
+  'timestamp' : bigint,
+}
 export interface RSVP {
   'name' : string,
   'inviteCode' : string,
@@ -34,6 +40,7 @@ export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'generateInviteCode' : ActorMethod<[], string>,
+  'getAllOpenRSVPs' : ActorMethod<[], Array<OpenRSVPEntry>>,
   'getAllRSVPs' : ActorMethod<[], Array<RSVP>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
@@ -41,6 +48,7 @@ export interface _SERVICE {
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'submitOpenRSVP' : ActorMethod<[string, string, string], undefined>,
   'submitRSVP' : ActorMethod<[string, boolean, string], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
