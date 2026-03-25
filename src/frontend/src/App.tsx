@@ -1,5 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Calendar, Check, Download, MapPin, Menu, X } from "lucide-react";
+import {
+  Calendar,
+  Check,
+  Clock,
+  Download,
+  MapPin,
+  Menu,
+  X,
+} from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { SiInstagram } from "react-icons/si";
 
@@ -273,7 +281,7 @@ function Navbar() {
           }}
           data-ocid="nav.link"
         >
-          SOF <span>2026</span>
+          <span style={{ color: "oklch(0 0 0)" }}>SOF</span> <span>2026</span>
         </button>
 
         {/* Desktop nav */}
@@ -376,16 +384,36 @@ function HeroSection() {
   }, []);
 
   return (
-    <section id="home" className="w-full" style={{ paddingTop: "64px" }}>
-      {/* Full-width banner image — fully visible, no cropping */}
-      <img
-        src="/assets/uploads/2-019d1c03-2494-702b-9d4a-8a06f32802ea-1.jpg"
-        alt="State of Fashion 2026 — SOF is Back"
-        style={{ display: "block", width: "100%", height: "auto" }}
-      />
-
-      {/* RSVP button — evenly spaced below banner */}
-      <div className="flex items-center justify-center py-8 sm:py-10 px-4">
+    <section
+      id="home"
+      className="w-full"
+      style={{
+        paddingTop: "64px",
+      }}
+    >
+      {/* Banner image */}
+      <div className="w-full">
+        <img
+          src="/assets/uploads/2-019d24a1-7483-7332-8e61-a339de638d1c-1.jpg"
+          alt="State of Fashion 2026 — SOF is Back"
+          className="block w-full sm:hidden"
+          style={{
+            height: "auto",
+            objectFit: "contain",
+          }}
+        />
+        <img
+          src="/assets/uploads/2-019d24a1-7483-7332-8e61-a339de638d1c-1.jpg"
+          alt="State of Fashion 2026 — SOF is Back"
+          className="hidden sm:block w-full"
+          style={{
+            height: "calc(100svh - 64px)",
+            objectFit: "contain",
+          }}
+        />
+      </div>
+      {/* RSVP button — below hero image */}
+      <div className="flex items-center justify-center py-6 px-4">
         <button
           type="button"
           onClick={handleRSVP}
@@ -461,7 +489,7 @@ function WhatIsSOFSection() {
               className="font-display text-4xl sm:text-5xl font-bold mb-4"
               style={{ color: "oklch(0 0 0)" }}
             >
-              What is SOF?
+              What is <span style={{ color: "#a855f7" }}>SOF</span>?
             </h2>
             <BlackDivider />
           </div>
@@ -610,7 +638,7 @@ function ThemeRevealSection() {
               style={{
                 width: "100%",
                 height: "100%",
-                objectFit: "cover",
+                objectFit: "contain",
                 display: "block",
               }}
             />
@@ -740,7 +768,7 @@ function EventDetailsSection() {
         </h2>
         <BlackDivider />
 
-        <div className="mt-10 sm:mt-12 grid sm:grid-cols-2 gap-6 max-w-2xl mx-auto">
+        <div className="mt-10 sm:mt-12 grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
           {/* Date card — reduced padding on mobile */}
           <OrnateCornerBorder className="p-4 sm:p-8">
             <div
@@ -752,7 +780,7 @@ function EventDetailsSection() {
             >
               <Calendar
                 className="mx-auto mb-4"
-                style={{ color: "oklch(0 0 0)" }}
+                style={{ color: "#22c55e" }}
                 size={40}
               />
               <p
@@ -787,7 +815,7 @@ function EventDetailsSection() {
             >
               <MapPin
                 className="mx-auto mb-4"
-                style={{ color: "oklch(0 0 0)" }}
+                style={{ color: "#eab308" }}
                 size={40}
               />
               <p
@@ -807,6 +835,49 @@ function EventDetailsSection() {
                 style={{ color: "oklch(0.35 0 0)" }}
               >
                 Pali Hill, Bandra, Mumbai
+              </p>
+            </div>
+          </OrnateCornerBorder>
+          {/* Time card */}
+          <OrnateCornerBorder className="p-4 sm:p-8">
+            <div
+              className="rounded-xl p-5 sm:p-6 text-center"
+              style={{
+                backgroundColor: "#ffffff",
+                border: "1px solid oklch(0 0 0 / 0.12)",
+              }}
+            >
+              <Clock
+                className="mx-auto mb-4"
+                style={{ color: "#a855f7" }}
+                size={40}
+              />
+              <p
+                className="font-body text-xs font-semibold tracking-[0.2em] uppercase mb-1"
+                style={{ color: "oklch(0 0 0 / 0.5)" }}
+              >
+                Time
+              </p>
+              <h3
+                className="font-display text-lg font-bold"
+                style={{ color: "oklch(0 0 0)" }}
+              >
+                2–7 PM
+              </h3>
+              <p
+                className="font-body text-sm mt-1"
+                style={{ color: "oklch(0.35 0 0)" }}
+              >
+                SOF Event
+              </p>
+              <p
+                className="font-body text-sm mt-2 pt-2 border-t"
+                style={{
+                  color: "oklch(0.35 0 0)",
+                  borderColor: "oklch(0 0 0 / 0.1)",
+                }}
+              >
+                8–10 PM – Live DJ
               </p>
             </div>
           </OrnateCornerBorder>
@@ -1068,7 +1139,7 @@ function RSVPSection() {
           className="font-body text-base mb-6"
           style={{ color: "oklch(0.25 0 0)" }}
         >
-          Join us for a night of fashion, culture, and fire 🔥
+          Join us for a day filled with fashion, fun and culture!
         </p>
         <BlackDivider />
 
