@@ -38,7 +38,7 @@ actor {
   let userProfiles = Map.empty<Principal, UserProfile>();
 
   // Store open RSVP entries
-  var openRSVPEntries : [OpenRSVPEntry] = [];
+  stable var openRSVPEntries : [OpenRSVPEntry] = [];
 
   // Submit open RSVP (no login required)
   public func submitOpenRSVP(name : Text, email : Text, phone : Text) : async () {

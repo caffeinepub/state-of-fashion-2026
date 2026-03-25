@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { backendInterface } from "../backend.d";
 import { useActor } from "./useActor";
 
@@ -10,6 +10,7 @@ export interface RSVPFormData {
 
 export function useSubmitOpenRSVP() {
   const { actor } = useActor();
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (data: RSVPFormData) => {
@@ -19,6 +20,9 @@ export function useSubmitOpenRSVP() {
         data.email,
         data.phone,
       );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["openRSVPs"] });
     },
   });
 }
@@ -33,5 +37,8 @@ export function useGetAllOpenRSVPs() {
       return await (actor as unknown as backendInterface).getAllOpenRSVPs();
     },
     enabled: !!actor,
+    staleTime: 0,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 }

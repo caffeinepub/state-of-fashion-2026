@@ -968,11 +968,13 @@ function RSVPSection() {
   const [phone, setPhone] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [showAdmin, setShowAdmin] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const tripleClickCount = useRef(0);
   const tripleClickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const submitOpenRSVPMutation = useSubmitOpenRSVP();
-  const { data: rsvpEntries = [] } = useGetAllOpenRSVPs();
+  const { data: rsvpEntries = [], refetch: refetchRSVPs } =
+    useGetAllOpenRSVPs();
 
   const handleLimitedSeatsClick = () => {
     tripleClickCount.current += 1;
@@ -990,16 +992,22 @@ function RSVPSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await submitOpenRSVPMutation.mutateAsync({
-      name: name.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
-    });
-    setSubmitted(true);
+    setSubmitError("");
+    try {
+      await submitOpenRSVPMutation.mutateAsync({
+        name: name.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+      });
+      setSubmitted(true);
+    } catch {
+      setSubmitError("Something went wrong. Please try again.");
+    }
   };
 
-  const handleExportCSV = () => {
-    const entries = rsvpEntries;
+  const handleExportCSV = async () => {
+    const result = await refetchRSVPs();
+    const entries = result.data ?? rsvpEntries;
     const header = "Name,Email,Phone,Timestamp";
     const rows = entries.map(
       (r) =>
@@ -1218,6 +1226,14 @@ function RSVPSection() {
                   ? "Registering..."
                   : "Register Your Interest"}
               </button>
+              {submitError && (
+                <p
+                  className="mt-3 text-sm text-center"
+                  style={{ color: "oklch(0.5 0.2 27)" }}
+                >
+                  {submitError}
+                </p>
+              )}
             </form>
           )}
         </div>
