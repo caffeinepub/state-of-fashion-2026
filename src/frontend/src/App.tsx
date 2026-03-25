@@ -392,24 +392,11 @@ function HeroSection() {
       }}
     >
       {/* Banner image */}
-      <div className="w-full">
+      <div className="w-full sm:h-[calc(100svh-64px)]">
         <img
           src="/assets/uploads/2-019d24a1-7483-7332-8e61-a339de638d1c-1.jpg"
           alt="State of Fashion 2026 — SOF is Back"
-          className="block w-full sm:hidden"
-          style={{
-            height: "auto",
-            objectFit: "contain",
-          }}
-        />
-        <img
-          src="/assets/uploads/2-019d24a1-7483-7332-8e61-a339de638d1c-1.jpg"
-          alt="State of Fashion 2026 — SOF is Back"
-          className="hidden sm:block w-full"
-          style={{
-            height: "calc(100svh - 64px)",
-            objectFit: "contain",
-          }}
+          className="block w-full h-auto sm:h-full sm:object-contain"
         />
       </div>
       {/* RSVP button — below hero image */}
