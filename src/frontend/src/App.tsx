@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useCallback, useRef, useState } from "react";
 import { SiInstagram } from "react-icons/si";
+import { useGetAllOpenRSVPs, useSubmitOpenRSVP } from "./hooks/useQueries";
 
 const queryClient = new QueryClient();
 
@@ -961,15 +962,6 @@ function ScheduleSection() {
 
 // ─── RSVP Section ─────────────────────────────────────────────────────────────
 
-const STORAGE_KEY = "sof2026_rsvp_entries";
-
-type RSVPEntry = {
-  name: string;
-  email: string;
-  phone: string;
-  timestamp: string;
-};
-
 function RSVPSection() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -978,6 +970,9 @@ function RSVPSection() {
   const [showAdmin, setShowAdmin] = useState(false);
   const tripleClickCount = useRef(0);
   const tripleClickTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const submitOpenRSVPMutation = useSubmitOpenRSVP();
+  const { data: rsvpEntries = [] } = useGetAllOpenRSVPs();
 
   const handleLimitedSeatsClick = () => {
     tripleClickCount.current += 1;
@@ -993,30 +988,22 @@ function RSVPSection() {
     }, 600);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const entry: RSVPEntry = {
+    await submitOpenRSVPMutation.mutateAsync({
       name: name.trim(),
       email: email.trim(),
       phone: phone.trim(),
-      timestamp: new Date().toISOString(),
-    };
-    const existing: RSVPEntry[] = JSON.parse(
-      localStorage.getItem(STORAGE_KEY) ?? "[]",
-    );
-    existing.push(entry);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+    });
     setSubmitted(true);
   };
 
   const handleExportCSV = () => {
-    const entries: RSVPEntry[] = JSON.parse(
-      localStorage.getItem(STORAGE_KEY) ?? "[]",
-    );
+    const entries = rsvpEntries;
     const header = "Name,Email,Phone,Timestamp";
     const rows = entries.map(
       (r) =>
-        `"${r.name.replace(/"/g, '""')}","${r.email.replace(/"/g, '""')}","${r.phone.replace(/"/g, '""')}","${r.timestamp}"`,
+        `"${r.name.replace(/"/g, '""')}","${r.email.replace(/"/g, '""')}","${r.phone.replace(/"/g, '""')}","${new Date(Number(r.timestamp / 1000000n)).toISOString()}"`,
     );
     const csv = [header, ...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
@@ -1028,9 +1015,7 @@ function RSVPSection() {
     URL.revokeObjectURL(url);
   };
 
-  const entryCount = JSON.parse(
-    localStorage.getItem(STORAGE_KEY) ?? "[]",
-  ).length;
+  const entryCount = rsvpEntries.length;
 
   const inputStyle = {
     width: "100%",
@@ -1224,11 +1209,14 @@ function RSVPSection() {
 
               <button
                 type="submit"
-                className="w-full py-3 rounded-full font-display font-bold text-sm tracking-widest uppercase transition-opacity hover:opacity-80"
+                disabled={submitOpenRSVPMutation.isPending}
+                className="w-full py-3 rounded-full font-display font-bold text-sm tracking-widest uppercase transition-opacity hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: "oklch(0 0 0)", color: "#ffffff" }}
                 data-ocid="rsvp.submit_button"
               >
-                Register Your Interest
+                {submitOpenRSVPMutation.isPending
+                  ? "Registering..."
+                  : "Register Your Interest"}
               </button>
             </form>
           )}

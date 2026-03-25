@@ -6,6 +6,8 @@ import Text "mo:core/Text";
 import Random "mo:core/Random";
 import Map "mo:core/Map";
 import Principal "mo:core/Principal";
+import Time "mo:base/Time";
+import Array "mo:base/Array";
 
 actor {
   // Initialize the access control state
@@ -24,8 +26,35 @@ actor {
     phone : ?Text;
   };
 
+  // Open RSVP entry type (no invite code required)
+  public type OpenRSVPEntry = {
+    name : Text;
+    email : Text;
+    phone : Text;
+    timestamp : Int;
+  };
+
   // Store user profiles
   let userProfiles = Map.empty<Principal, UserProfile>();
+
+  // Store open RSVP entries
+  var openRSVPEntries : [OpenRSVPEntry] = [];
+
+  // Submit open RSVP (no login required)
+  public func submitOpenRSVP(name : Text, email : Text, phone : Text) : async () {
+    let entry : OpenRSVPEntry = {
+      name = name;
+      email = email;
+      phone = phone;
+      timestamp = Time.now();
+    };
+    openRSVPEntries := Array.append(openRSVPEntries, [entry]);
+  };
+
+  // Get all open RSVP entries
+  public query func getAllOpenRSVPs() : async [OpenRSVPEntry] {
+    openRSVPEntries;
+  };
 
   // Get caller's own user profile (users only)
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
@@ -62,8 +91,7 @@ actor {
     code;
   };
 
-  // Submit RSVP (public - any user including guests, but requires valid invite code)
-  // The invite code validation is handled by the InviteLinksModule
+  // Submit RSVP with invite code
   public shared ({ caller }) func submitRSVP(name : Text, attending : Bool, inviteCode : Text) : async () {
     InviteLinksModule.submitRSVP(inviteState, name, attending, inviteCode);
   };
