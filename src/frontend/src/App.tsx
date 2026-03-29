@@ -8,7 +8,7 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SiInstagram } from "react-icons/si";
 import { useActor } from "./hooks/useActor";
 import { useGetAllOpenRSVPs, useSubmitOpenRSVP } from "./hooks/useQueries";
@@ -975,14 +975,29 @@ function RSVPSection() {
 
   const submitOpenRSVPMutation = useSubmitOpenRSVP();
   const { actor, isFetching: isActorLoading } = useActor();
-  const { data: rsvpEntries = [], refetch: refetchRSVPs } =
-    useGetAllOpenRSVPs();
+  const {
+    data: rsvpEntries = [],
+    refetch: refetchRSVPs,
+    isLoading: isRSVPLoading,
+    error: rsvpError,
+  } = useGetAllOpenRSVPs();
+
+  useEffect(() => {
+    if (showAdmin) {
+      refetchRSVPs();
+    }
+  }, [showAdmin, refetchRSVPs]);
 
   const handleLimitedSeatsClick = () => {
     tripleClickCount.current += 1;
     if (tripleClickCount.current >= 3) {
       tripleClickCount.current = 0;
-      setShowAdmin((v) => !v);
+      setShowAdmin((prev) => {
+        if (!prev) {
+          setTimeout(() => refetchRSVPs(), 0);
+        }
+        return !prev;
+      });
       if (tripleClickTimer.current) clearTimeout(tripleClickTimer.current);
       return;
     }
@@ -1102,12 +1117,94 @@ function RSVPSection() {
             }}
             data-ocid="rsvp.panel"
           >
-            <p
-              className="font-display text-sm mb-3"
-              style={{ color: "oklch(0 0 0)" }}
-            >
-              {entryCount} response{entryCount !== 1 ? "s" : ""} registered
-            </p>
+            <div className="flex items-center justify-between mb-3">
+              <p
+                className="font-display text-sm"
+                style={{ color: "oklch(0 0 0)" }}
+              >
+                {isRSVPLoading
+                  ? "Loading..."
+                  : `${entryCount} response${entryCount !== 1 ? "s" : ""} registered`}
+              </p>
+              <button
+                type="button"
+                onClick={() => refetchRSVPs()}
+                className="text-xs px-3 py-1 rounded-full font-display tracking-widest uppercase transition-opacity hover:opacity-70 border"
+                style={{
+                  borderColor: "oklch(0 0 0)",
+                  color: "oklch(0 0 0)",
+                  backgroundColor: "transparent",
+                }}
+                data-ocid="rsvp.secondary_button"
+              >
+                Refresh
+              </button>
+            </div>
+            {rsvpError && (
+              <p
+                className="text-xs mb-3"
+                style={{ color: "oklch(0.5 0.2 27)" }}
+                data-ocid="rsvp.error_state"
+              >
+                Error loading data:{" "}
+                {rsvpError instanceof Error
+                  ? rsvpError.message
+                  : "Unknown error"}
+              </p>
+            )}
+            {isRSVPLoading ? (
+              <p
+                className="text-xs mb-3"
+                style={{ color: "oklch(0.5 0 0)" }}
+                data-ocid="rsvp.loading_state"
+              >
+                Fetching submissions from backend...
+              </p>
+            ) : rsvpEntries.length === 0 ? (
+              <p
+                className="text-xs mb-3"
+                style={{ color: "oklch(0.5 0 0)" }}
+                data-ocid="rsvp.empty_state"
+              >
+                No submissions yet.
+              </p>
+            ) : (
+              <div
+                className="mb-3 rounded border overflow-y-auto"
+                style={{ maxHeight: 300, borderColor: "oklch(0 0 0 / 0.15)" }}
+                data-ocid="rsvp.list"
+              >
+                {rsvpEntries.map((r, i) => (
+                  <div
+                    key={`${r.email}-${i}`}
+                    className="px-3 py-2 text-xs border-b last:border-b-0"
+                    style={{
+                      borderColor: "oklch(0 0 0 / 0.08)",
+                      color: "oklch(0.15 0 0)",
+                    }}
+                    data-ocid={`rsvp.item.${i + 1}`}
+                  >
+                    <span className="font-semibold">{r.name}</span>
+                    <span className="mx-2" style={{ color: "oklch(0.5 0 0)" }}>
+                      ·
+                    </span>
+                    <span>{r.email}</span>
+                    <span className="mx-2" style={{ color: "oklch(0.5 0 0)" }}>
+                      ·
+                    </span>
+                    <span>{r.phone}</span>
+                    <span
+                      className="ml-2 block mt-0.5"
+                      style={{ color: "oklch(0.6 0 0)", fontSize: "10px" }}
+                    >
+                      {new Date(
+                        Number(r.timestamp / 1000000n),
+                      ).toLocaleString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
             <button
               type="button"
               onClick={handleExportCSV}
